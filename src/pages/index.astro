@@ -1,10 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Finder from '../components/Finder.astro';
-import { META, recipes } from '../lib/data.js';
+import { BRAND, recipes } from '../lib/data.js';
 ---
 <Base description={`${recipes.length} מתכוני מרק עם חיפוש לפי סוג, מסורת, טעם ומרכיבים שיש בבית. כל הגרסאות של כל מרק זו לצד זו.`}>
-  <h1>{META.site.name}</h1>
-  <p class="lead">{META.site.tagline}. מסננים לפי סוג, מסורת וטעם, או מסמנים מה יש במקרר ורואים איזה מרק הכי קרוב.</p>
+  <h1>{BRAND.name}</h1>
+  <p class="lead">{BRAND.tagline}. מסננים לפי סוג, מסורת וטעם, או מסמנים מה יש במקרר ורואים איזה מרק הכי קרוב.</p>
   <Finder />
 </Base>

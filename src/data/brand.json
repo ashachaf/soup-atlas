@@ -1,0 +1,37 @@
+{
+  "name": "אטלס המרקים",
+  "tagline": "כל הגרסאות של כל מרק, ומה אפשר לבשל ממה שיש בבית",
+  "footerNote": "המתכונים נכתבו על סמך כמה מקורות ועדיין לא נבדקו במטבח. המקורות מופיעים בתחתית כל מתכון.",
+
+  "colors": {
+    "bg": "#fffdf8",
+    "surface": "#ffffff",
+    "ink": "#1f1a17",
+    "muted": "#5d554e",
+    "line": "#e7e1d8",
+    "accent": "#c2410c",
+    "accentSoft": "#ffe6d2",
+    "herb": "#2f7a36",
+    "herbSoft": "#e0f3d9",
+    "warn": "#b42318"
+  },
+
+  "fonts": {
+    "heading": "'Frank Ruhl Libre', Georgia, serif",
+    "body": "Heebo, system-ui, sans-serif",
+    "baseSize": "17px",
+    "googleFontsUrl": "https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&display=swap"
+  },
+
+  "shape": {
+    "radius": "14px"
+  },
+
+  "doodles": {
+    "enabled": true,
+    "animate": true,
+    "opacity": 0.85,
+    "sheetOpacity": 0.9,
+    "outline": "#3b2a20"
+  }
+}

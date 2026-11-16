@@ -1,17 +1,6 @@
 :root {
-  /* Always light: dark text on a near-white page, easy to read on a phone while cooking. */
+  /* Colors, fonts and shape are set in src/data/brand.json and injected by Base.astro. */
   color-scheme: light;
-  --bg: #fffdf8;
-  --surface: #ffffff;
-  --ink: #1f1a17;
-  --muted: #5d554e;
-  --line: #e7e1d8;
-  --accent: #c2410c;
-  --accent-soft: #ffe6d2;
-  --herb: #2f7a36;
-  --herb-soft: #e0f3d9;
-  --warn: #b42318;
-  --radius: 14px;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -19,18 +8,18 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: Heebo, system-ui, sans-serif;
-  font-size: 17px;
+  font-family: var(--font-body);
+  font-size: var(--font-size);
   line-height: 1.65;
 }
 /* The page content sits on a mostly opaque sheet, so the floating doodles stay faint behind text. */
 main {
   position: relative; z-index: 1; max-width: 1040px; margin: 20px auto 40px; padding: 24px 20px 48px;
-  background: rgb(255 255 255 / 0.9); border-radius: 22px; box-shadow: 0 0 0 1px rgb(31 26 23 / 0.05);
+  background: color-mix(in srgb, var(--surface) calc(var(--sheet-opacity) * 100%), transparent); border-radius: 22px; box-shadow: 0 0 0 1px rgb(31 26 23 / 0.05);
 }
 @media (max-width: 1080px) { main { margin-inline: 10px; padding-inline: 14px; } }
 .site-header, .site-footer { position: relative; z-index: 1; }
-h1, h2, h3 { font-family: 'Frank Ruhl Libre', Georgia, serif; line-height: 1.2; text-wrap: balance; margin: 0; }
+h1, h2, h3 { font-family: var(--font-heading); line-height: 1.2; text-wrap: balance; margin: 0; }
 h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); }
 h2 { font-size: 1.5rem; margin-top: 44px; margin-bottom: 14px; }
 h3 { font-size: 1.15rem; }
@@ -44,8 +33,8 @@ a { color: var(--accent); text-underline-offset: 3px; }
   display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
   max-width: 1040px; margin: 0 auto; padding: 18px 16px 0;
 }
-.brand, .site-header nav a, .site-footer p { background: rgb(255 255 255 / 0.85); border-radius: 8px; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.brand { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 1.4rem; color: var(--ink); text-decoration: none; }
+.brand, .site-header nav a, .site-footer p { background: color-mix(in srgb, var(--surface) 85%, transparent); border-radius: 8px; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.brand { font-family: var(--font-heading); font-weight: 700; font-size: 1.4rem; color: var(--ink); text-decoration: none; }
 .site-header nav { display: flex; flex-wrap: wrap; gap: 4px 18px; }
 .site-header nav a { color: var(--muted); text-decoration: none; }
 .site-header nav a:hover { color: var(--accent); }
@@ -89,7 +78,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .group > h2 { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; margin-top: 30px; }
 .group > h2 a { color: var(--ink); text-decoration: none; }
 .group > h2 a:hover { color: var(--accent); }
-.group > h2 small { font-family: Heebo, sans-serif; font-size: 0.9rem; font-weight: 400; color: var(--muted); }
+.group > h2 small { font-family: var(--font-body); font-size: 0.9rem; font-weight: 400; color: var(--muted); }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
 .card {
   display: flex; flex-direction: column; gap: 8px; background: var(--surface); border: 1px solid var(--line);
@@ -130,7 +119,7 @@ td:first-child { font-weight: 700; min-width: 150px; }
   background: var(--surface); color: var(--ink); font-size: 1.2rem; line-height: 1; cursor: pointer;
 }
 .servings output { font-weight: 700; min-width: 1.5em; text-align: center; font-variant-numeric: tabular-nums; }
-.ing-group { font-family: Heebo, sans-serif; font-size: 0.9rem; color: var(--muted); font-weight: 500; margin: 16px 0 4px; }
+.ing-group { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); font-weight: 500; margin: 16px 0 4px; }
 .ings { list-style: none; padding: 0; margin: 0; }
 .ings li { border-bottom: 1px solid var(--line); }
 .ings label { display: flex; gap: 10px; padding: 9px 0; cursor: pointer; align-items: baseline; }

@@ -1,9 +1,10 @@
 import ING from '../data/ingredients.json';
 import META from '../data/meta.json';
+import BRAND from '../data/brand.json';
 
 const modules = import.meta.glob('../data/recipes/*.json', { eager: true });
 export const recipes = Object.values(modules).map((m) => m.default ?? m);
-export { ING, META };
+export { ING, META, BRAND };
 
 // Fail the build on bad data instead of rendering a broken page.
 for (const r of recipes) {

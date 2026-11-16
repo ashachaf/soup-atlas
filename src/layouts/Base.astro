@@ -1,10 +1,24 @@
 ---
-import { META } from '../lib/data.js';
+import { BRAND, META } from '../lib/data.js';
 import Doodles from '../components/Doodles.astro';
 import '../styles/global.css';
 const { title, description, doodles } = Astro.props;
-const fullTitle = title ? `${title} | ${META.site.name}` : `${META.site.name}: ${META.site.tagline}`;
-const desc = description ?? META.site.tagline;
+const fullTitle = title ? `${title} | ${BRAND.name}` : `${BRAND.name}: ${BRAND.tagline}`;
+const desc = description ?? BRAND.tagline;
+
+// Brand tokens become CSS variables, so brand.json is the only place to change the look.
+const kebab = (k) => k.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+const vars = {
+  ...Object.fromEntries(Object.entries(BRAND.colors).map(([k, v]) => [kebab(k), v])),
+  'font-heading': BRAND.fonts.heading,
+  'font-body': BRAND.fonts.body,
+  'font-size': BRAND.fonts.baseSize,
+  radius: BRAND.shape.radius,
+  'sheet-opacity': BRAND.doodles.enabled ? BRAND.doodles.sheetOpacity : 1,
+  'doodle-opacity': BRAND.doodles.opacity,
+  'doodle-outline': BRAND.doodles.outline,
+};
+const brandCss = `:root{${Object.entries(vars).map(([k, v]) => `--${k}:${v}`).join(';')}}`;
 ---
 <!doctype html>
 <html lang="he" dir="rtl">
@@ -20,20 +34,21 @@ const desc = description ?? META.site.tagline;
     {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet" />
+    {BRAND.fonts.googleFontsUrl && <link href={BRAND.fonts.googleFontsUrl} rel="stylesheet" />}
+    <style is:inline set:html={brandCss} />
     <slot name="head" />
   </head>
   <body>
-    <Doodles ids={doodles} />
+    {BRAND.doodles.enabled && <Doodles ids={doodles} animate={BRAND.doodles.animate} />}
     <header class="site-header">
-      <a class="brand" href="/">{META.site.name}</a>
+      <a class="brand" href="/">{BRAND.name}</a>
       <nav>
         {Object.entries(META.families).map(([id, f]) => <a href={`/soups/${id}/`}>{f.title}</a>)}
       </nav>
     </header>
     <main><slot /></main>
     <footer class="site-footer">
-      <p>המתכונים נכתבו על סמך כמה מקורות ועדיין לא נבדקו במטבח. המקורות מופיעים בתחתית כל מתכון.</p>
+      <p>{BRAND.footerNote}</p>
     </footer>
   </body>
 </html>
