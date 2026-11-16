@@ -24,7 +24,7 @@ const ld = {
   itemListElement: members.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.title, url: `/recipes/${r.slug}/` })),
 };
 ---
-<Base title={`${info.title}: ${count} והשוואה ביניהן`} description={info.intro}>
+<Base title={`${info.title}: ${count} והשוואה ביניהן`} description={info.intro} doodles={members.flatMap((r) => r.ingredients.map((l) => l.id))}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
   <p class="crumbs"><a href="/">כל המרקים</a> ‹ {info.title}</p>
   <h1>{info.title}</h1>

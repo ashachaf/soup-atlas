@@ -1,0 +1,143 @@
+---
+// Cartoon ingredients that float behind the page. A recipe page passes its own ingredient ids,
+// so the background is drawn from what is actually in that soup.
+const ICON_FOR = {
+  carrot: 'carrot',
+  onion: 'onion', scallion: 'onion',
+  chicken: 'drumstick', 'ground-chicken': 'drumstick', 'turkey-neck': 'drumstick', 'chicken-stock': 'bowl',
+  celery: 'herb', parsley: 'herb', dill: 'herb', cilantro: 'herb', basil: 'herb', thyme: 'herb',
+  'bay-leaf': 'herb', 'kaffir-lime': 'herb', lemongrass: 'herb',
+  lemon: 'lemon', 'dried-lime': 'lemon', lime: 'lime',
+  garlic: 'garlic',
+  chili: 'chili', schug: 'chili',
+  mushrooms: 'mushroom',
+  egg: 'egg',
+  potato: 'potato', 'celery-root': 'potato',
+  tomato: 'tomato',
+  'thin-noodles': 'noodles', 'rice-noodles': 'noodles',
+  'star-anise': 'star',
+  chickpeas: 'peas', 'soup-almonds': 'peas',
+};
+const ALL = ['bowl', 'carrot', 'onion', 'drumstick', 'herb', 'lemon', 'garlic', 'chili', 'mushroom', 'egg', 'potato', 'tomato', 'noodles', 'star', 'peas', 'lime'];
+
+const { ids } = Astro.props;
+let icons = ids ? [...new Set(ids.map((id) => ICON_FOR[id]).filter(Boolean))] : ALL;
+if (icons.length < 4) icons = [...new Set([...icons, 'bowl', 'herb', 'carrot', 'onion'])];
+if (ids && !icons.includes('bowl')) icons.push('bowl');
+
+// top %, left %, size px, rotation deg
+const SPOTS = [
+  [3, 2, 78, -15], [9, 84, 68, 20], [24, 8, 58, 10], [31, 90, 84, -25], [46, 1, 70, 30], [57, 85, 62, -10],
+  [70, 6, 80, 15], [81, 88, 72, 25], [91, 28, 60, -20], [1, 44, 54, 12], [17, 62, 50, -8], [39, 48, 56, 18],
+  [63, 38, 52, -14], [88, 62, 64, 8], [51, 68, 48, -30], [76, 52, 58, 22],
+];
+---
+<div class="doodles" aria-hidden="true">
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <g id="d-carrot" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M42 18C42 8 48 4 52 6 52 12 48 16 42 18Z" fill="#6cc24a" />
+        <path d="M44 20C52 14 60 16 60 20 56 24 50 24 44 20Z" fill="#6cc24a" />
+        <path d="M40 18C50 22 50 32 44 38L16 58C12 60 8 56 10 52L26 22C30 16 36 16 40 18Z" fill="#ff9a3c" />
+        <path d="M30 30l6 4M22 42l6 4" fill="none" />
+      </g>
+      <g id="d-onion" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 14C36 22 52 26 52 40 52 52 42 58 32 58 22 58 12 52 12 40 12 26 28 22 32 14Z" fill="#c9a0e8" />
+        <path d="M32 22C26 32 24 44 30 56M32 22C38 32 40 44 34 56M32 14C30 9 32 6 35 4" fill="none" />
+      </g>
+      <g id="d-drumstick" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M27 37L16 48" stroke-width="10" />
+        <path d="M27 37L16 48" stroke="#fff" stroke-width="5" />
+        <circle cx="13" cy="46" r="4.5" fill="#fff" />
+        <circle cx="18" cy="51" r="4.5" fill="#fff" />
+        <ellipse cx="39" cy="25" rx="17" ry="14" transform="rotate(-35 39 25)" fill="#f0a35e" />
+        <path d="M40 16c5 0 9 3 10 7" fill="none" stroke="#fff" stroke-width="2.5" />
+      </g>
+      <g id="d-herb" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 60V16" fill="none" />
+        <path d="M32 48C22 48 15 42 15 35 24 35 30 40 32 48ZM32 48C42 48 49 42 49 35 40 35 34 40 32 48Z" fill="#6cc24a" />
+        <path d="M32 32C23 32 17 27 17 20 25 20 30 25 32 32ZM32 32C41 32 47 27 47 20 39 20 34 25 32 32Z" fill="#8bd35f" />
+        <path d="M32 18C27 14 27 8 32 4 37 8 37 14 32 18Z" fill="#6cc24a" />
+      </g>
+      <g id="d-lemon" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="32" cy="32" r="23" fill="#ffd93b" />
+        <circle cx="32" cy="32" r="17" fill="#fff6b0" />
+        <path d="M32 15V49M17 23.5L47 40.5M17 40.5L47 23.5" fill="none" stroke-width="2" />
+      </g>
+      <g id="d-lime" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="32" cy="32" r="23" fill="#8ed14f" />
+        <circle cx="32" cy="32" r="17" fill="#e6f7b5" />
+        <path d="M32 15V49M17 23.5L47 40.5M17 40.5L47 23.5" fill="none" stroke-width="2" />
+      </g>
+      <g id="d-garlic" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 8C32 18 50 26 50 42 50 52 42 57 32 57 22 57 14 52 14 42 14 26 32 18 32 8Z" fill="#fff4e0" />
+        <path d="M32 20C27 30 26 44 29 56M32 20C37 30 38 44 35 56" fill="none" />
+      </g>
+      <g id="d-chili" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M18 16C12 12 10 9 6 9" fill="none" stroke="#3b2a20" stroke-width="6" />
+        <path d="M18 16C12 12 10 9 6 9" fill="none" stroke="#6cc24a" stroke-width="2.5" />
+        <path d="M18 14C40 14 54 30 56 52 44 50 22 42 14 24 12 19 14 14 18 14Z" fill="#f2553f" />
+        <path d="M24 20c8 2 14 8 18 14" fill="none" stroke="#fff" stroke-width="2.5" />
+      </g>
+      <g id="d-mushroom" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M24 34V50C24 57 40 57 40 50V34Z" fill="#fff4e0" />
+        <path d="M8 36C8 18 21 9 32 9 43 9 56 18 56 36Z" fill="#f2785c" />
+        <circle cx="22" cy="24" r="4" fill="#fff" /><circle cx="38" cy="20" r="5" fill="#fff" /><circle cx="45" cy="30" r="3" fill="#fff" />
+      </g>
+      <g id="d-egg" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 6C44 6 53 27 53 40 53 52 44 59 32 59 20 59 11 52 11 40 11 27 20 6 32 6Z" fill="#fff8ea" />
+        <circle cx="32" cy="40" r="10" fill="#ffc533" />
+      </g>
+      <g id="d-potato" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M12 30C12 16 30 10 43 15 56 20 60 35 53 45 46 56 27 57 17 49 11 44 12 36 12 30Z" fill="#e3b877" />
+        <path d="M24 26h.1M40 24h.1M44 38h.1M28 44h.1" fill="none" stroke-width="4" />
+      </g>
+      <g id="d-tomato" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="32" cy="37" r="21" fill="#f2553f" />
+        <path d="M32 21L23 13 27 22 18 22 32 28 46 22 37 22 41 13Z" fill="#6cc24a" />
+      </g>
+      <g id="d-noodles" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M44 6L30 32M52 10L36 32" fill="none" />
+        <path d="M14 32C14 20 23 20 23 32M25 32C25 16 36 16 36 32M38 32C38 22 48 22 48 32" fill="none" stroke="#3b2a20" stroke-width="7" />
+        <path d="M14 32C14 20 23 20 23 32M25 32C25 16 36 16 36 32M38 32C38 22 48 22 48 32" fill="none" stroke="#ffd166" stroke-width="3" />
+        <path d="M6 32H58C58 47 47 58 32 58 17 58 6 47 6 32Z" fill="#62b6e8" />
+      </g>
+      <g id="d-bowl" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M24 20C19 15 28 12 23 6M40 20C35 15 44 12 39 6" fill="none" />
+        <path d="M6 32H58C58 47 47 58 32 58 17 58 6 47 6 32Z" fill="#f2785c" />
+        <ellipse cx="32" cy="32" rx="26" ry="6" fill="#ffd166" />
+      </g>
+      <g id="d-star" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M32 6L37 22 52 12 43 27 58 32 43 37 52 52 37 43 32 58 27 43 12 52 21 37 6 32 21 27 12 12 27 22Z" fill="#c98a5a" />
+        <circle cx="32" cy="32" r="5" fill="#ffd166" />
+      </g>
+      <g id="d-peas" stroke="#3b2a20" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+        <circle cx="22" cy="24" r="12" fill="#f4d98f" /><circle cx="43" cy="30" r="11" fill="#f4d98f" /><circle cx="28" cy="46" r="11" fill="#f4d98f" />
+      </g>
+    </defs>
+  </svg>
+  {SPOTS.map(([top, left, size, rot], i) => (
+    <svg
+      class="doodle"
+      viewBox="0 0 64 64"
+      style={`top:${top}%;left:${left}%;--s:${size}px;--r:${rot}deg;animation-duration:${7 + (i % 5)}s;animation-delay:-${i * 0.9}s`}
+    >
+      <use href={`#d-${icons[i % icons.length]}`} />
+    </svg>
+  ))}
+</div>
+
+<style>
+  .doodles { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+  .doodle {
+    position: absolute; width: var(--s); height: var(--s); opacity: 0.85;
+    rotate: var(--r); animation: bob ease-in-out infinite alternate;
+  }
+  @keyframes bob {
+    from { translate: 0 -10px; rotate: calc(var(--r) - 6deg); }
+    to { translate: 0 12px; rotate: calc(var(--r) + 6deg); }
+  }
+  @media (max-width: 760px) { .doodle { width: calc(var(--s) * 0.72); height: calc(var(--s) * 0.72); } }
+  @media (prefers-reduced-motion: reduce) { .doodle { animation: none; } }
+  @media print { .doodles { display: none; } }
+</style>

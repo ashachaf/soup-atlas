@@ -1,7 +1,8 @@
 ---
 import { META } from '../lib/data.js';
+import Doodles from '../components/Doodles.astro';
 import '../styles/global.css';
-const { title, description } = Astro.props;
+const { title, description, doodles } = Astro.props;
 const fullTitle = title ? `${title} | ${META.site.name}` : `${META.site.name}: ${META.site.tagline}`;
 const desc = description ?? META.site.tagline;
 ---
@@ -23,6 +24,7 @@ const desc = description ?? META.site.tagline;
     <slot name="head" />
   </head>
   <body>
+    <Doodles ids={doodles} />
     <header class="site-header">
       <a class="brand" href="/">{META.site.name}</a>
       <nav>

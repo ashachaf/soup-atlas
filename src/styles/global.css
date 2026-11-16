@@ -1,29 +1,17 @@
 :root {
-  --bg: #fbf6ec;
-  --surface: #fffdf8;
-  --ink: #2a2118;
-  --muted: #6f6253;
-  --line: #e6dccb;
-  --accent: #b8660f;
-  --accent-soft: #f6e4c4;
-  --herb: #4f6f2f;
-  --herb-soft: #e3ecd4;
-  --warn: #a23b2a;
+  /* Always light: dark text on a near-white page, easy to read on a phone while cooking. */
+  color-scheme: light;
+  --bg: #fffdf8;
+  --surface: #ffffff;
+  --ink: #1f1a17;
+  --muted: #5d554e;
+  --line: #e7e1d8;
+  --accent: #c2410c;
+  --accent-soft: #ffe6d2;
+  --herb: #2f7a36;
+  --herb-soft: #e0f3d9;
+  --warn: #b42318;
   --radius: 14px;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1b1611;
-    --surface: #251e17;
-    --ink: #f3eadb;
-    --muted: #b3a48f;
-    --line: #3a3026;
-    --accent: #e9a53f;
-    --accent-soft: #45321a;
-    --herb: #a9c77f;
-    --herb-soft: #2c3a20;
-    --warn: #e58a78;
-  }
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -35,7 +23,13 @@ body {
   font-size: 17px;
   line-height: 1.65;
 }
-main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 64px; }
+/* The page content sits on a mostly opaque sheet, so the floating doodles stay faint behind text. */
+main {
+  position: relative; z-index: 1; max-width: 1040px; margin: 20px auto 40px; padding: 24px 20px 48px;
+  background: rgb(255 255 255 / 0.9); border-radius: 22px; box-shadow: 0 0 0 1px rgb(31 26 23 / 0.05);
+}
+@media (max-width: 1080px) { main { margin-inline: 10px; padding-inline: 14px; } }
+.site-header, .site-footer { position: relative; z-index: 1; }
 h1, h2, h3 { font-family: 'Frank Ruhl Libre', Georgia, serif; line-height: 1.2; text-wrap: balance; margin: 0; }
 h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); }
 h2 { font-size: 1.5rem; margin-top: 44px; margin-bottom: 14px; }
@@ -48,13 +42,14 @@ a { color: var(--accent); text-underline-offset: 3px; }
 
 .site-header {
   display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: baseline;
-  max-width: 1040px; margin: 0 auto; padding: 18px 16px; border-bottom: 1px solid var(--line);
+  max-width: 1040px; margin: 0 auto; padding: 18px 16px 0;
 }
+.brand, .site-header nav a, .site-footer p { background: rgb(255 255 255 / 0.85); border-radius: 8px; padding: 0 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .brand { font-family: 'Frank Ruhl Libre', serif; font-weight: 700; font-size: 1.4rem; color: var(--ink); text-decoration: none; }
 .site-header nav { display: flex; flex-wrap: wrap; gap: 4px 18px; }
 .site-header nav a { color: var(--muted); text-decoration: none; }
 .site-header nav a:hover { color: var(--accent); }
-.site-footer { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.88rem; }
+.site-footer { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; color: var(--muted); font-size: 0.88rem; }
 .crumbs { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; }
 .crumbs a { color: var(--muted); }
 
