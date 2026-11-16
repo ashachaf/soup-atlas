@@ -1,7 +1,7 @@
 ---
 // Search, filters and pantry matching. Cards are rendered on the server (so links are crawlable)
 // and the script below only hides, reorders and annotates them.
-import { recipes, ING, META, inFamily, coreIds, ids, topFlavors, totalTime, fmtTime } from '../lib/data.js';
+import { link, recipes, ING, META, inFamily, coreIds, ids, topFlavors, totalTime, fmtTime } from '../lib/data.js';
 
 const { family } = Astro.props;
 const pool = family ? recipes.filter((r) => inFamily(r, family)) : recipes;
@@ -13,7 +13,7 @@ const groupDefs = family
       { key: 'local', title: META.families[family].compare === false ? META.families[family].title : 'הגרסאות הביתיות', compare: META.families[family].compare !== false },
       { key: 'world', title: `${META.families[family].title} מהעולם`, compare: true },
     ]
-  : Object.entries(META.families).map(([key, f]) => ({ key, title: f.title, href: `/soups/${key}/`, compare: f.compare !== false }));
+  : Object.entries(META.families).map(([key, f]) => ({ key, title: f.title, href: link(`/soups/${key}/`), compare: f.compare !== false }));
 const groups = groupDefs
   .map((g) => ({ ...g, items: pool.filter((r) => groupKey(r) === g.key) }))
   .filter((g) => g.items.length);
@@ -108,7 +108,7 @@ const data = {
         </h2>
         <div class="cards">
           {g.items.map((r) => (
-            <a class="card" href={`/recipes/${r.slug}/`} data-slug={r.slug}>
+            <a class="card" href={link(`/recipes/${r.slug}/`)} data-slug={r.slug}>
               <h3>{r.title}</h3>
               <div class="tags">
                 <span class="tag">{r.tradition}</span>

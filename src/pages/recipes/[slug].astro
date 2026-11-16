@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { recipes, ING, META, bySlug, familyMembers, familyReference, diff, he, roleOf, totalTime, fmtTime } from '../../lib/data.js';
+import { link, recipes, ING, META, bySlug, familyMembers, familyReference, diff, he, roleOf, totalTime, fmtTime } from '../../lib/data.js';
 import { fmtQty } from '../../lib/qty.js';
 
 export function getStaticPaths() {
@@ -50,7 +50,7 @@ const ld = {
 ---
 <Base title={r.title} description={r.summary} doodles={r.ingredients.map((l) => l.id)}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <p class="crumbs"><a href="/">כל המרקים</a> ‹ <a href={`/soups/${r.family}/`}>{family.title}</a> ‹ {r.short}</p>
+  <p class="crumbs"><a href={link('/')}>כל המרקים</a> ‹ <a href={link(`/soups/${r.family}/`)}>{family.title}</a> ‹ {r.short}</p>
   <h1>{r.title}</h1>
   <p class="lead">{r.summary}</p>
 
@@ -89,7 +89,7 @@ const ld = {
                     {l.qty != null && <span class="qty" data-qty={l.qty} data-unit={l.unit}>{fmtQty(l.qty, l.unit)}</span>}
                     {' '}{l.unit}{' '}
                     {ING[l.id].recipe && ING[l.id].recipe !== r.slug
-                      ? <a href={`/recipes/${ING[l.id].recipe}/`}>{l.text ?? he(l.id)}</a>
+                      ? <a href={link(`/recipes/${ING[l.id].recipe}/`)}>{l.text ?? he(l.id)}</a>
                       : l.text ?? he(l.id)}
                     {roleOf(l) === 'optional' && <span class="opt">(לא חובה)</span>}
                   </span>
@@ -116,7 +116,7 @@ const ld = {
 
   {d && (
     <section class="other">
-      <h2>במה הגרסה הזו שונה מ<a href={`/recipes/${ref.slug}/`}>{ref.short}</a></h2>
+      <h2>במה הגרסה הזו שונה מ<a href={link(`/recipes/${ref.slug}/`)}>{ref.short}</a></h2>
       {d.added.length > 0 && <p class="plus"><strong>נוסף:</strong> {d.added.map(he).join(', ')}</p>}
       {d.removed.length > 0 && <p class="minus"><strong>יורד:</strong> {d.removed.map(he).join(', ')}</p>}
     </section>
@@ -126,7 +126,7 @@ const ld = {
     <section class="other">
       <h2>תוספות שמתאימות למרק הזה</h2>
       <div class="chips">
-        {addons.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.title}</a>)}
+        {addons.map((x) => <a class="chip" href={link(`/recipes/${x.slug}/`)}>{x.title}</a>)}
       </div>
     </section>
   )}
@@ -135,7 +135,7 @@ const ld = {
     <section class="other">
       <h2>מתאים למרקים האלה</h2>
       <div class="chips">
-        {goesWith.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.title}</a>)}
+        {goesWith.map((x) => <a class="chip" href={link(`/recipes/${x.slug}/`)}>{x.title}</a>)}
       </div>
     </section>
   )}
@@ -144,16 +144,16 @@ const ld = {
     <section class="other">
       <h2>ראו גם</h2>
       <div class="chips">
-        {seeAlso.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.title}</a>)}
+        {seeAlso.map((x) => <a class="chip" href={link(`/recipes/${x.slug}/`)}>{x.title}</a>)}
       </div>
     </section>
   )}
 
   {siblings.map((s) => (
     <section class="other">
-      <h2>{META.families[s.id].compare === false ? 'עוד ב' : 'עוד גרסאות של '}<a href={`/soups/${s.id}/`}>{s.title}</a></h2>
+      <h2>{META.families[s.id].compare === false ? 'עוד ב' : 'עוד גרסאות של '}<a href={link(`/soups/${s.id}/`)}>{s.title}</a></h2>
       <div class="chips">
-        {s.items.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.short}</a>)}
+        {s.items.map((x) => <a class="chip" href={link(`/recipes/${x.slug}/`)}>{x.short}</a>)}
       </div>
     </section>
   ))}

@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Finder from '../../components/Finder.astro';
-import { META, familyMembers, familyReference, sharedCore, diff, he, totalTime, fmtTime } from '../../lib/data.js';
+import { link, META, familyMembers, familyReference, sharedCore, diff, he, totalTime, fmtTime } from '../../lib/data.js';
 
 export function getStaticPaths() {
   return Object.keys(META.families).map((family) => ({ params: { family } }));
@@ -22,12 +22,12 @@ const ld = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
   name: info.title,
-  itemListElement: members.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.title, url: `/recipes/${r.slug}/` })),
+  itemListElement: members.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.title, url: Astro.site ? new URL(link(`/recipes/${r.slug}/`), Astro.site).href : link(`/recipes/${r.slug}/`) })),
 };
 ---
 <Base title={compare && members.length > 1 ? `${info.title}: ${count} והשוואה ביניהן` : info.title} description={info.intro} doodles={members.flatMap((r) => r.ingredients.map((l) => l.id))}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
-  <p class="crumbs"><a href="/">כל המרקים</a> ‹ {info.title}</p>
+  <p class="crumbs"><a href={link('/')}>כל המרקים</a> ‹ {info.title}</p>
   <h1>{info.title}</h1>
   <p class="lead">{info.intro}</p>
 
@@ -59,7 +59,7 @@ const ld = {
               const isRef = r.slug === ref.slug;
               return (
                 <tr>
-                  <td><a href={`/recipes/${r.slug}/`}>{r.short}</a></td>
+                  <td><a href={link(`/recipes/${r.slug}/`)}>{r.short}</a></td>
                   <td>{r.tradition}</td>
                   <td>{META.types[r.type]}</td>
                   <td style="white-space:nowrap">{fmtTime(totalTime(r))}</td>

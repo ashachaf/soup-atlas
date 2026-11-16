@@ -6,6 +6,11 @@ const modules = import.meta.glob('../data/recipes/*.json', { eager: true });
 export const recipes = Object.values(modules).map((m) => m.default ?? m);
 export { ING, META, BRAND };
 
+// The site may be served from a sub-path (GitHub Pages serves it under /soup-atlas), so every
+// internal link goes through link().
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
+export const link = (path) => `${BASE}${path}`;
+
 // Fail the build on bad data instead of rendering a broken page.
 for (const r of recipes) {
   for (const line of r.ingredients) {
