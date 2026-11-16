@@ -9,7 +9,7 @@
   "country": "תאילנד",
   "tradition": "תאילנדי",
   "flavor": { "spicy": 2, "sour": 2, "umami": 3, "herby": 2, "rich": 3, "spiced": 2 },
-  "signature": ["galangal", "lemongrass", "coconut-milk"],
+  "character": ["חלב קוקוס", "גלנגל ולמון גראס", "ליים"],
   "addIns": ["פטריות"],
   "diet": ["ללא גלוטן", "ללא חלב"],
   "prep": 15,

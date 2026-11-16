@@ -9,7 +9,7 @@
   "country": "ישראל",
   "tradition": "תימני",
   "flavor": { "spicy": 1, "sour": 0, "umami": 2, "herby": 2, "rich": 2, "spiced": 3 },
-  "signature": ["hawaij", "cilantro"],
+  "character": ["חוואיג'", "כוסברה", "תפוחי אדמה"],
   "addIns": ["תפוחי אדמה"],
   "diet": ["כשר", "ללא גלוטן", "ללא חלב"],
   "prep": 15,

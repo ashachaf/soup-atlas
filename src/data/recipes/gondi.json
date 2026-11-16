@@ -9,7 +9,7 @@
   "country": "ישראל",
   "tradition": "פרסי",
   "flavor": { "spicy": 0, "sour": 1, "umami": 2, "herby": 1, "rich": 2, "spiced": 2 },
-  "signature": ["cardamom", "turmeric"],
+  "character": ["כופתאות חומוס ועוף", "הל", "כורכום"],
   "addIns": ["כופתאות גונדי", "גרגירי חומוס"],
   "diet": ["כשר", "ללא גלוטן", "ללא חלב", "ללא ביצים"],
   "prep": 30,

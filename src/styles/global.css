@@ -100,9 +100,22 @@ th, td { text-align: start; padding: 10px 14px; border-bottom: 1px solid var(--l
 tr:last-child td { border-bottom: 0; }
 th { color: var(--muted); font-weight: 500; white-space: nowrap; }
 td:first-child { font-weight: 700; min-width: 150px; }
-tr.ref td { background: var(--accent-soft); }
 .plus { color: var(--herb); }
 .minus { color: var(--warn); }
+
+/* flavor comparison */
+.compare th.num, .compare td.num { text-align: center; padding-inline: 6px; }
+.compare td:first-child, .compare th:first-child { position: sticky; inset-inline-start: 0; background: var(--surface); z-index: 1; }
+.sort {
+  font: inherit; color: var(--muted); background: none; border: 0; padding: 2px 4px; cursor: pointer;
+  border-radius: 6px; white-space: nowrap; text-decoration: underline dotted; text-underline-offset: 4px;
+}
+.sort:hover { color: var(--accent); }
+.sort[aria-pressed='true'] { color: var(--accent); font-weight: 700; text-decoration: none; }
+.sort[aria-pressed='true']::after { content: ' ↓'; }
+.dots { display: inline-flex; gap: 3px; vertical-align: middle; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.dots i.on { background: var(--accent); }
 
 /* recipe */
 .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 10px; padding: 0; list-style: none; }

@@ -10,7 +10,7 @@
   "country": "ישראל",
   "tradition": "אשכנזי",
   "flavor": { "spicy": 0, "sour": 0, "umami": 2, "herby": 2, "rich": 1, "spiced": 0 },
-  "signature": ["dill", "parsley"],
+  "character": ["ירקות שורש", "שמיר", "פטרוזיליה"],
   "addIns": [],
   "diet": ["כשר", "ללא גלוטן", "ללא חלב"],
   "prep": 20,

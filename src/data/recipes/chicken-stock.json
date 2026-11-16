@@ -10,7 +10,7 @@
   "country": "בינלאומי",
   "tradition": "בסיס",
   "flavor": { "spicy": 0, "sour": 0, "umami": 3, "herby": 1, "rich": 2, "spiced": 0 },
-  "signature": [],
+  "character": ["עצמות וכנפיים", "בישול ארוך"],
   "addIns": [],
   "diet": ["כשר", "ללא גלוטן", "ללא חלב"],
   "prep": 10,

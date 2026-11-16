@@ -11,7 +11,7 @@
   "country": "ישראל",
   "tradition": "אשכנזי",
   "flavor": { "spicy": 0, "sour": 0, "umami": 1, "herby": 0, "rich": 2, "spiced": 0 },
-  "signature": [],
+  "character": [],
   "addIns": [],
   "diet": ["כשר", "ללא חלב", "מתאים לפסח"],
   "prep": 40,

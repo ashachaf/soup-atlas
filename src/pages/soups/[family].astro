@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Finder from '../../components/Finder.astro';
-import { link, abs, breadcrumbs, BRAND, META, familyMembers, familyReference, diff, he, totalTime, fmtTime } from '../../lib/data.js';
+import { link, abs, breadcrumbs, BRAND, META, familyMembers, familyReference, totalTime, fmtTime } from '../../lib/data.js';
 
 export function getStaticPaths() {
   return Object.keys(META.families).map((family) => ({ params: { family } }));
@@ -11,10 +11,10 @@ const { family } = Astro.params;
 const info = META.families[family];
 const compare = info.compare !== false;
 const ref = familyReference(family);
-// Reference first, then the local versions, then the ones from around the world.
+// Classic first, then the local versions, then the ones from around the world.
 const rank = (r) => (r.slug === ref.slug ? 0 : r.scope === 'local' ? 1 : 2);
 const members = familyMembers(family).sort((a, b) => rank(a) - rank(b));
-const names = (list) => list.map(he).join(', ');
+const flavorKeys = Object.keys(META.flavors);
 const count = members.length === 1 ? 'מתכון אחד' : compare ? `${members.length} גרסאות` : `${members.length} מתכונים`;
 
 const crumbs = breadcrumbs([[BRAND.name, '/'], [info.title, `/soups/${family}/`]]);
@@ -36,30 +36,37 @@ const ld = {
   {compare && members.length > 1 && (
     <>
       <h2>השוואה בין הגרסאות</h2>
+      <p class="muted small">כמה מכל טעם יש בכל גרסה, ומה נותן לה את האופי. לחיצה על טעם ממיינת לפיו.</p>
       <div class="table-wrap">
-        <table>
+        <table class="compare" id="compare">
           <thead>
-            <tr><th>גרסה</th><th>מסורת</th><th>סוג</th><th>זמן</th><th>מה נוסף לעומת {ref.short}</th><th>מה יורד</th></tr>
+            <tr>
+              <th>גרסה</th>
+              {flavorKeys.map((k) => <th class="num"><button type="button" class="sort" data-sort={k} aria-pressed="false">{META.flavors[k]}</button></th>)}
+              <th>מה נותן לו את האופי</th>
+              <th>מסורת</th>
+              <th>זמן</th>
+            </tr>
           </thead>
           <tbody>
-            {members.map((r) => {
-              const d = diff(r, ref);
-              const isRef = r.slug === ref.slug;
-              return (
-                <tr class:list={[{ ref: isRef }]}>
-                  <td><a href={link(`/recipes/${r.slug}/`)}>{r.short}</a></td>
-                  <td>{r.tradition}</td>
-                  <td>{META.types[r.type]}</td>
-                  <td style="white-space:nowrap">{fmtTime(totalTime(r))}</td>
-                  {isRef
-                    ? <td colspan="2" class="muted">כל שאר הגרסאות מושוות למרק הזה</td>
-                    : <>
-                        <td class="plus">{names(d.added) || '–'}</td>
-                        <td class="minus">{names(d.removed) || '–'}</td>
-                      </>}
-                </tr>
-              );
-            })}
+            {members.map((r, i) => (
+              <tr data-i={i} {...Object.fromEntries(flavorKeys.map((k) => [`data-${k}`, r.flavor[k] ?? 0]))}>
+                <td><a href={link(`/recipes/${r.slug}/`)}>{r.short}</a></td>
+                {flavorKeys.map((k) => {
+                  const v = r.flavor[k] ?? 0;
+                  return (
+                    <td class="num">
+                      <span class="dots" role="img" aria-label={`${META.flavors[k]}: ${v} מתוך 3`}>
+                        {[1, 2, 3].map((n) => <i class:list={[{ on: n <= v }]} />)}
+                      </span>
+                    </td>
+                  );
+                })}
+                <td>{r.character.join(' · ')}</td>
+                <td>{r.tradition}</td>
+                <td style="white-space:nowrap">{fmtTime(totalTime(r))}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -69,3 +76,24 @@ const ld = {
   <h2>{members.length === 1 ? 'המתכון' : compare ? 'בחירת גרסה' : 'כל התוספות'}</h2>
   <Finder family={family} />
 </Base>
+
+<script>
+  // Sort the comparison by a flavor, strongest first; a second click restores the original order.
+  const table = document.getElementById('compare');
+  if (table) {
+    const body = table.tBodies[0];
+    const rows = [...body.rows];
+    let current = null;
+    table.addEventListener('click', (e) => {
+      const btn = e.target.closest('button.sort');
+      if (!btn) return;
+      const key = btn.dataset.sort;
+      current = current === key ? null : key;
+      const sorted = current
+        ? [...rows].sort((a, b) => b.dataset[current] - a.dataset[current] || a.dataset.i - b.dataset.i)
+        : rows;
+      body.append(...sorted);
+      for (const b of table.querySelectorAll('button.sort')) b.setAttribute('aria-pressed', String(b.dataset.sort === current));
+    });
+  }
+</script>

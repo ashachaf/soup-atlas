@@ -10,7 +10,7 @@
   "country": "ישראל",
   "tradition": "תוספת",
   "flavor": { "spicy": 0, "sour": 0, "umami": 0, "herby": 0, "rich": 1, "spiced": 0 },
-  "signature": [],
+  "character": [],
   "addIns": [],
   "diet": ["ללא חלב"],
   "prep": 2,

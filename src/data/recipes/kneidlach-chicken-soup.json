@@ -10,7 +10,7 @@
   "country": "ישראל",
   "tradition": "אשכנזי",
   "flavor": { "spicy": 0, "sour": 0, "umami": 2, "herby": 2, "rich": 2, "spiced": 0 },
-  "signature": ["dill"],
+  "character": ["קניידלך", "שמיר"],
   "addIns": ["קניידלך"],
   "diet": ["כשר", "ללא חלב", "מתאים לפסח"],
   "prep": 30,

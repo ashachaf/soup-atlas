@@ -9,7 +9,7 @@
   "country": "גאורגיה",
   "tradition": "גאורגי",
   "flavor": { "spicy": 0, "sour": 2, "umami": 2, "herby": 3, "rich": 3, "spiced": 1 },
-  "signature": ["cilantro", "vinegar", "coriander-seed"],
+  "character": ["חלמונים וחומץ", "כוסברה טרייה"],
   "addIns": ["חלמונים"],
   "diet": ["כשר", "ללא חלב"],
   "prep": 20,

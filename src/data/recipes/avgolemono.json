@@ -9,7 +9,7 @@
   "country": "יוון",
   "tradition": "יווני",
   "flavor": { "spicy": 0, "sour": 3, "umami": 2, "herby": 1, "rich": 2, "spiced": 0 },
-  "signature": ["lemon", "egg"],
+  "character": ["ביצה ולימון", "אורז"],
   "addIns": ["אורז", "ביצה"],
   "diet": ["כשר", "ללא גלוטן", "ללא חלב"],
   "prep": 15,

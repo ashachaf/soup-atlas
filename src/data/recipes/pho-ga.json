@@ -10,7 +10,7 @@
   "country": "וייטנאם",
   "tradition": "וייטנאמי",
   "flavor": { "spicy": 1, "sour": 1, "umami": 3, "herby": 3, "rich": 1, "spiced": 3 },
-  "signature": ["star-anise", "ginger", "cinnamon"],
+  "character": ["ג'ינג'ר ובצל חרוכים", "כוכב אניס וקינמון", "עשבי תיבול טריים"],
   "addIns": ["אטריות אורז", "נבטים", "עשבי תיבול טריים"],
   "diet": ["ללא גלוטן", "ללא חלב"],
   "prep": 25,
