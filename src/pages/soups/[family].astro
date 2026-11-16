@@ -43,13 +43,17 @@ const ld = {
               const d = diff(r, ref);
               const isRef = r.slug === ref.slug;
               return (
-                <tr>
+                <tr class:list={[{ ref: isRef }]}>
                   <td><a href={link(`/recipes/${r.slug}/`)}>{r.short}</a></td>
                   <td>{r.tradition}</td>
                   <td>{META.types[r.type]}</td>
                   <td style="white-space:nowrap">{fmtTime(totalTime(r))}</td>
-                  <td class="plus">{isRef ? <span class="muted">גרסת הייחוס</span> : names(d.added) || '–'}</td>
-                  <td class="minus">{isRef ? '' : names(d.removed) || '–'}</td>
+                  {isRef
+                    ? <td colspan="2" class="muted">כל שאר הגרסאות מושוות למרק הזה</td>
+                    : <>
+                        <td class="plus">{names(d.added) || '–'}</td>
+                        <td class="minus">{names(d.removed) || '–'}</td>
+                      </>}
                 </tr>
               );
             })}
