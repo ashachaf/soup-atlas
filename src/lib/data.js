@@ -53,15 +53,6 @@ export function diff(r, ref) {
   };
 }
 
-/** How many of the given recipes use each core ingredient, most common first. */
-export function sharedCore(members) {
-  const counts = {};
-  for (const r of members) for (const id of coreIds(r)) counts[id] = (counts[id] ?? 0) + 1;
-  return Object.entries(counts)
-    .map(([id, count]) => ({ id, count }))
-    .sort((x, y) => y.count - x.count);
-}
-
 export const topFlavors = (r) =>
   Object.entries(r.flavor)
     .filter(([, v]) => v >= 2)

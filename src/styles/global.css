@@ -101,10 +101,6 @@ th { color: var(--muted); font-weight: 500; white-space: nowrap; }
 td:first-child { font-weight: 700; min-width: 150px; }
 .plus { color: var(--herb); }
 .minus { color: var(--warn); }
-.shared { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
-.shared li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; font-size: 0.93rem; }
-.shared li.all { border-color: var(--herb); background: var(--herb-soft); }
-.shared small { color: var(--muted); margin-inline-start: 6px; }
 
 /* recipe */
 .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 18px 0 10px; padding: 0; list-style: none; }

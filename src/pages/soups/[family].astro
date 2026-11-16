@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Finder from '../../components/Finder.astro';
-import { link, META, familyMembers, familyReference, sharedCore, diff, he, totalTime, fmtTime } from '../../lib/data.js';
+import { link, META, familyMembers, familyReference, diff, he, totalTime, fmtTime } from '../../lib/data.js';
 
 export function getStaticPaths() {
   return Object.keys(META.families).map((family) => ({ params: { family } }));
@@ -14,7 +14,6 @@ const ref = familyReference(family);
 // Reference first, then the local versions, then the ones from around the world.
 const rank = (r) => (r.slug === ref.slug ? 0 : r.scope === 'local' ? 1 : 2);
 const members = familyMembers(family).sort((a, b) => rank(a) - rank(b));
-const shared = sharedCore(members).filter((s) => s.count / members.length >= 1 / 3);
 const names = (list) => list.map(he).join(', ');
 const count = members.length === 1 ? 'מתכון אחד' : compare ? `${members.length} גרסאות` : `${members.length} מתכונים`;
 
@@ -30,20 +29,6 @@ const ld = {
   <p class="crumbs"><a href={link('/')}>כל המרקים</a> ‹ {info.title}</p>
   <h1>{info.title}</h1>
   <p class="lead">{info.intro}</p>
-
-  {compare && members.length > 1 && shared.length > 0 && (
-    <>
-      <h2>מה משותף לגרסאות</h2>
-      <ul class="shared">
-        {shared.map((s) => (
-          <li class={s.count === members.length ? 'all' : ''}>
-            {he(s.id)}<small>{s.count === members.length ? 'בכולן' : `ב-${s.count} מתוך ${members.length}`}</small>
-          </li>
-        ))}
-      </ul>
-      <p class="muted small" style="margin-top:10px">זה סיכום של המשותף ולא מתכון. כל גרסה למטה היא מתכון מלא שעומד בפני עצמו.</p>
-    </>
-  )}
 
   {compare && members.length > 1 && (
     <>
