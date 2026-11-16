@@ -3,8 +3,12 @@
 // and the script below only hides, reorders and annotates them.
 import { link, recipes, ING, META, inFamily, coreIds, ids, topFlavors, totalTime, fmtTime } from '../lib/data.js';
 
-const { family } = Astro.props;
-const pool = family ? recipes.filter((r) => inFamily(r, family)) : recipes;
+const { family, kind } = Astro.props;
+const pool = family
+  ? recipes.filter((r) => inFamily(r, family))
+  : kind
+    ? recipes.filter((r) => META.families[r.family].kind === kind)
+    : recipes;
 
 // Home groups by family; a family page groups by local vs. world versions.
 const groupKey = (r) => (family ? r.scope : r.family);

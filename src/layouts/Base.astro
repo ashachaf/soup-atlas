@@ -43,7 +43,7 @@ const brandCss = `:root{${Object.entries(vars).map(([k, v]) => `--${k}:${v}`).jo
     <header class="site-header">
       <a class="brand" href={link('/')}>{BRAND.name}</a>
       <nav>
-        {Object.entries(META.families).map(([id, f]) => <a href={link(`/soups/${id}/`)}>{f.title}</a>)}
+        {META.nav.map((n) => <a href={link(n.href)} aria-current={Astro.url.pathname === link(n.href) ? 'page' : undefined}>{n.label}</a>)}
       </nav>
     </header>
     <main><slot /></main>

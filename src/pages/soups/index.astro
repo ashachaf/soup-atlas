@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import Finder from '../../components/Finder.astro';
+import { META, recipes, link } from '../../lib/data.js';
+
+const soupFamilies = Object.values(META.families).filter((f) => f.kind === 'soup');
+const count = recipes.filter((r) => META.families[r.family].kind === 'soup').length;
+---
+<Base title="כל המרקים" description={`${count} מתכוני מרק מ-${soupFamilies.length} משפחות, עם חיפוש לפי סוג, מסורת, טעם ומרכיבים שיש בבית.`}>
+  <p class="crumbs"><a href={link('/')}>דף הבית</a> ‹ מרקים</p>
+  <h1>מרקים</h1>
+  <p class="lead">כל המרקים לפי משפחות. בכל משפחה אפשר להשוות בין הגרסאות ולבחור את זו שמתאימה למה שיש בבית.</p>
+  <Finder kind="soup" />
+</Base>
