@@ -9,13 +9,14 @@ export function getStaticPaths() {
 
 const { family } = Astro.params;
 const info = META.families[family];
+const compare = info.compare !== false;
 const ref = familyReference(family);
 // Reference first, then the local versions, then the ones from around the world.
 const rank = (r) => (r.slug === ref.slug ? 0 : r.scope === 'local' ? 1 : 2);
 const members = familyMembers(family).sort((a, b) => rank(a) - rank(b));
 const shared = sharedCore(members).filter((s) => s.count / members.length >= 1 / 3);
 const names = (list) => list.map(he).join(', ');
-const count = members.length === 1 ? 'גרסה אחת' : `${members.length} גרסאות`;
+const count = members.length === 1 ? 'מתכון אחד' : compare ? `${members.length} גרסאות` : `${members.length} מתכונים`;
 
 const ld = {
   '@context': 'https://schema.org',
@@ -24,13 +25,13 @@ const ld = {
   itemListElement: members.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.title, url: `/recipes/${r.slug}/` })),
 };
 ---
-<Base title={`${info.title}: ${count} והשוואה ביניהן`} description={info.intro} doodles={members.flatMap((r) => r.ingredients.map((l) => l.id))}>
+<Base title={compare && members.length > 1 ? `${info.title}: ${count} והשוואה ביניהן` : info.title} description={info.intro} doodles={members.flatMap((r) => r.ingredients.map((l) => l.id))}>
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
   <p class="crumbs"><a href="/">כל המרקים</a> ‹ {info.title}</p>
   <h1>{info.title}</h1>
   <p class="lead">{info.intro}</p>
 
-  {members.length > 1 && shared.length > 0 && (
+  {compare && members.length > 1 && shared.length > 0 && (
     <>
       <h2>מה משותף לגרסאות</h2>
       <ul class="shared">
@@ -44,7 +45,7 @@ const ld = {
     </>
   )}
 
-  {members.length > 1 && (
+  {compare && members.length > 1 && (
     <>
       <h2>השוואה בין הגרסאות</h2>
       <div class="table-wrap">
@@ -73,6 +74,6 @@ const ld = {
     </>
   )}
 
-  <h2>{members.length > 1 ? 'בחירת גרסה' : 'המתכון'}</h2>
+  <h2>{members.length === 1 ? 'המתכון' : compare ? 'בחירת גרסה' : 'כל התוספות'}</h2>
   <Finder family={family} />
 </Base>

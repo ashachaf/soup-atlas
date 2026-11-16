@@ -28,6 +28,7 @@ The drawings themselves, and which ingredient maps to which drawing, are in
 ## Content
 
 - `src/data/recipes/*.json`: one file per recipe. Each is a complete, standalone recipe.
+  An add-on (noodles and the like) is a recipe in the `addons` family with a `goesWith` list of the soups it suits; it is not a soup variation.
 - `src/data/ingredients.json`: the ingredient dictionary (names, aliases, substitutions, staples).
 - `src/data/meta.json`: soup families and the labels for types and flavors.
 

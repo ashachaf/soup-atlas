@@ -10,7 +10,10 @@ export function getStaticPaths() {
 const r = bySlug[Astro.params.slug];
 const family = META.families[r.family];
 const ref = familyReference(r.family);
-const d = r.slug === ref.slug ? null : diff(r, ref);
+const d = family.compare === false || r.slug === ref.slug ? null : diff(r, ref);
+const addons = recipes.filter((x) => (x.goesWith ?? []).includes(r.slug));
+const seeAlso = (r.seeAlso ?? []).map((slug) => bySlug[slug]).filter(Boolean);
+const goesWith = (r.goesWith ?? []).map((slug) => bySlug[slug]).filter(Boolean);
 const siblings = [r.family, ...(r.alsoIn ?? [])].map((f) => ({
   id: f,
   title: META.families[f].title,
@@ -34,7 +37,7 @@ const ld = {
   name: r.title,
   description: r.summary,
   inLanguage: 'he',
-  recipeCategory: 'מרק',
+  recipeCategory: r.type === 'addon' ? 'תוספת למרק' : 'מרק',
   recipeCuisine: r.tradition,
   keywords: [family.title, r.tradition, META.types[r.type]].join(', '),
   prepTime: iso(r.prep),
@@ -119,9 +122,36 @@ const ld = {
     </section>
   )}
 
+  {addons.length > 0 && (
+    <section class="other">
+      <h2>תוספות שמתאימות למרק הזה</h2>
+      <div class="chips">
+        {addons.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.title}</a>)}
+      </div>
+    </section>
+  )}
+
+  {goesWith.length > 0 && (
+    <section class="other">
+      <h2>מתאים למרקים האלה</h2>
+      <div class="chips">
+        {goesWith.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.title}</a>)}
+      </div>
+    </section>
+  )}
+
+  {seeAlso.length > 0 && (
+    <section class="other">
+      <h2>ראו גם</h2>
+      <div class="chips">
+        {seeAlso.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.title}</a>)}
+      </div>
+    </section>
+  )}
+
   {siblings.map((s) => (
     <section class="other">
-      <h2>עוד גרסאות של <a href={`/soups/${s.id}/`}>{s.title}</a></h2>
+      <h2>{META.families[s.id].compare === false ? 'עוד ב' : 'עוד גרסאות של '}<a href={`/soups/${s.id}/`}>{s.title}</a></h2>
       <div class="chips">
         {s.items.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.short}</a>)}
       </div>

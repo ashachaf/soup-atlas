@@ -11,6 +11,9 @@ for (const r of recipes) {
   for (const line of r.ingredients) {
     if (!ING[line.id]) throw new Error(`${r.slug}: unknown ingredient "${line.id}"`);
   }
+  for (const slug of [...(r.goesWith ?? []), ...(r.seeAlso ?? [])]) {
+    if (!modules[`../data/recipes/${slug}.json`]) throw new Error(`${r.slug}: links to unknown recipe "${slug}"`);
+  }
   for (const f of [r.family, ...(r.alsoIn ?? [])]) {
     if (!META.families[f]) throw new Error(`${r.slug}: unknown family "${f}"`);
   }
