@@ -1,0 +1,245 @@
+---
+// Search, filters and pantry matching. Cards are rendered on the server (so links are crawlable)
+// and the script below only hides, reorders and annotates them.
+import { recipes, ING, META, inFamily, coreIds, ids, topFlavors, totalTime, fmtTime } from '../lib/data.js';
+
+const { family } = Astro.props;
+const pool = family ? recipes.filter((r) => inFamily(r, family)) : recipes;
+
+// Home groups by family; a family page groups by local vs. world versions.
+const groupKey = (r) => (family ? r.scope : r.family);
+const groupDefs = family
+  ? [
+      { key: 'local', title: 'הגרסאות הביתיות' },
+      { key: 'world', title: `${META.families[family].title} מהעולם` },
+    ]
+  : Object.entries(META.families).map(([key, f]) => ({ key, title: f.title, href: `/soups/${key}/` }));
+const groups = groupDefs
+  .map((g) => ({ ...g, items: pool.filter((r) => groupKey(r) === g.key) }))
+  .filter((g) => g.items.length);
+
+const uniq = (arr) => [...new Set(arr)];
+const types = uniq(pool.map((r) => r.type));
+const traditions = uniq(pool.map((r) => r.tradition));
+const flavors = Object.keys(META.flavors).filter((k) => pool.some((r) => r.flavor[k] >= 2));
+
+const pantryIds = uniq(pool.flatMap((r) => ids(r)));
+const cats = uniq(pantryIds.map((id) => ING[id].cat));
+
+const data = {
+  recipes: pool.map((r) => ({
+    slug: r.slug,
+    type: r.type,
+    tradition: r.tradition,
+    flavor: r.flavor,
+    core: coreIds(r),
+    text: [r.title, r.tradition, r.country, ...r.ingredients.flatMap((l) => [ING[l.id].he, ...(ING[l.id].aliases ?? [])])]
+      .join(' ')
+      .toLowerCase(),
+  })),
+  ing: Object.fromEntries(pantryIds.map((id) => [id, { he: ING[id].he, subs: ING[id].subs ?? [] }])),
+};
+---
+<section class="finder" id="finder">
+  <div class="finder-panel">
+    <input type="search" id="f-q" placeholder="חיפוש לפי שם, מסורת או מרכיב" aria-label="חיפוש מרקים" />
+    {types.length > 1 && (
+      <div class="filter-row">
+        <span>סוג</span>
+        <div class="chips">
+          {types.map((t) => <button class="chip" type="button" data-filter="type" data-value={t} aria-pressed="false">{META.types[t]}</button>)}
+        </div>
+      </div>
+    )}
+    {traditions.length > 1 && (
+      <div class="filter-row">
+        <span>מסורת</span>
+        <div class="chips">
+          {traditions.map((t) => <button class="chip" type="button" data-filter="tradition" data-value={t} aria-pressed="false">{t}</button>)}
+        </div>
+      </div>
+    )}
+    {flavors.length > 0 && (
+      <div class="filter-row">
+        <span>טעם</span>
+        <div class="chips">
+          {flavors.map((f) => <button class="chip" type="button" data-filter="flavor" data-value={f} aria-pressed="false">{META.flavors[f]}</button>)}
+        </div>
+      </div>
+    )}
+    <details class="pantry" id="f-pantry">
+      <summary>מה יש לי בבית? <span class="muted small" id="f-pantry-count"></span></summary>
+      <div class="pantry-body">
+        <p class="muted small" style="margin:0">מסמנים את מה שיש במקרר ובמזווה. מים, מלח, פלפל ושמן נחשבים תמיד.</p>
+        {cats.map((cat) => (
+          <div class="pantry-cat">
+            <span>{cat}</span>
+            <div class="chips">
+              {pantryIds.filter((id) => ING[id].cat === cat).map((id) => (
+                <button class="chip herb" type="button" data-have={id} aria-pressed="false">{ING[id].he}</button>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div class="pantry-tools">
+          <label>להציג מרקים שחסרים בהם
+            <select id="f-miss">
+              <option value="">כל מספר של מרכיבים</option>
+              <option value="0">0 מרכיבים</option>
+              <option value="1">עד מרכיב אחד</option>
+              <option value="2">עד 2 מרכיבים</option>
+              <option value="3">עד 3 מרכיבים</option>
+            </select>
+          </label>
+          <button class="linkbtn" type="button" id="f-clear-pantry">ניקוי הרשימה</button>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <p class="status" id="f-status" aria-live="polite"></p>
+
+  <div class="groups">
+    {groups.map((g) => (
+      <section class="group" data-group={g.key}>
+        <h2>
+          {g.href ? <a href={g.href}>{g.title}</a> : g.title}
+          <small>{g.items.length === 1 ? 'גרסה אחת' : `${g.items.length} גרסאות`}{g.href && <> · <a href={g.href}>השוואה מלאה</a></>}</small>
+        </h2>
+        <div class="cards">
+          {g.items.map((r) => (
+            <a class="card" href={`/recipes/${r.slug}/`} data-slug={r.slug}>
+              <h3>{r.title}</h3>
+              <div class="tags">
+                <span class="tag">{r.tradition}</span>
+                <span class="tag herb">{META.types[r.type]}</span>
+                {topFlavors(r).slice(0, 2).map((f) => <span class="tag plain">{META.flavors[f]}</span>)}
+                <span class="tag plain">{fmtTime(totalTime(r))}</span>
+              </div>
+              <p>{r.summary}</p>
+              <div class="match" hidden></div>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+  <p id="f-empty" hidden>לא נמצא מרק שמתאים לכל הסינונים. <button class="linkbtn" type="button" id="f-reset">איפוס הסינונים</button></p>
+  <script type="application/json" id="f-data" set:html={JSON.stringify(data)} />
+</section>
+
+<script>
+  const root = document.getElementById('finder');
+  if (root) {
+    const data = JSON.parse(document.getElementById('f-data').textContent);
+    const $ = (id) => document.getElementById(id);
+    const q = $('f-q');
+    const miss = $('f-miss');
+    const STORE = 'soup-pantry';
+
+    const state = { q: '', type: new Set(), tradition: new Set(), flavor: new Set(), have: new Set(), miss: '' };
+
+    // Initial state: filters from the URL, pantry from the URL or the last visit.
+    const params = new URLSearchParams(location.search);
+    const list = (key) => (params.get(key) ?? '').split(',').filter(Boolean);
+    state.q = params.get('q') ?? '';
+    for (const key of ['type', 'tradition', 'flavor']) state[key] = new Set(list(key));
+    state.miss = params.get('miss') ?? '';
+    let saved = [];
+    try { saved = JSON.parse(localStorage.getItem(STORE) ?? '[]'); } catch {}
+    state.have = new Set((params.has('have') ? list('have') : saved).filter((id) => data.ing[id]));
+
+    function match(r) {
+      const have = [], swaps = [], missing = [];
+      for (const id of r.core) {
+        if (state.have.has(id)) { have.push(id); continue; }
+        const sub = (data.ing[id]?.subs ?? []).find((s) => state.have.has(s));
+        if (sub) swaps.push([id, sub]);
+        else missing.push(id);
+      }
+      return { have, swaps, missing, total: r.core.length, score: (have.length + swaps.length) / r.core.length };
+    }
+
+    function render() {
+      const words = state.q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      const usePantry = state.have.size > 0;
+      const name = (id) => data.ing[id]?.he ?? id;
+      let shown = 0;
+
+      for (const r of data.recipes) {
+        const card = root.querySelector(`[data-slug="${r.slug}"]`);
+        const m = match(r);
+        const ok =
+          words.every((w) => r.text.includes(w)) &&
+          (!state.type.size || state.type.has(r.type)) &&
+          (!state.tradition.size || state.tradition.has(r.tradition)) &&
+          [...state.flavor].every((f) => r.flavor[f] >= 2) &&
+          (!usePantry || state.miss === '' || m.missing.length <= Number(state.miss));
+        card.hidden = !ok;
+        if (ok) shown++;
+        card.style.order = usePantry ? String(1000 - Math.round(m.score * 1000)) : '';
+        card.dataset.score = String(m.score);
+
+        const box = card.querySelector('.match');
+        box.hidden = !usePantry;
+        if (usePantry) {
+          const parts = [`<b>יש לך ${m.have.length + m.swaps.length} מתוך ${m.total}</b>`];
+          if (m.missing.length) parts.push(`<span class="miss">חסר: ${m.missing.map(name).join(', ')}</span>`);
+          else parts.push('אפשר להתחיל לבשל');
+          if (m.swaps.length) parts.push(`החלפה: ${m.swaps.map(([a, b]) => `${name(b)} במקום ${name(a)}`).join(', ')}`);
+          box.innerHTML = parts.join(' · ');
+        }
+      }
+
+      // Hide empty groups; with a pantry, the group holding the best match comes first.
+      for (const group of root.querySelectorAll('.group')) {
+        const visible = [...group.querySelectorAll('.card')].filter((c) => !c.hidden);
+        group.hidden = !visible.length;
+        const best = Math.max(0, ...visible.map((c) => Number(c.dataset.score)));
+        group.style.order = usePantry ? String(1000 - Math.round(best * 1000)) : '';
+      }
+
+      $('f-empty').hidden = shown > 0;
+      const filtered = shown < data.recipes.length;
+      $('f-status').textContent = usePantry
+        ? `${shown} מרקים, מהקרוב ביותר למה שיש לך בבית`
+        : filtered ? `${shown} מתוך ${data.recipes.length} מרקים` : '';
+      $('f-pantry-count').textContent = usePantry ? `(${state.have.size} מסומנים)` : '';
+
+      for (const b of root.querySelectorAll('[data-filter]')) b.setAttribute('aria-pressed', String(state[b.dataset.filter].has(b.dataset.value)));
+      for (const b of root.querySelectorAll('[data-have]')) b.setAttribute('aria-pressed', String(state.have.has(b.dataset.have)));
+
+      // Keep the URL shareable and remember the pantry for next time.
+      const out = new URLSearchParams();
+      if (state.q) out.set('q', state.q);
+      for (const key of ['type', 'tradition', 'flavor', 'have']) if (state[key].size) out.set(key, [...state[key]].join(','));
+      if (state.miss) out.set('miss', state.miss);
+      const qs = out.toString();
+      history.replaceState(null, '', qs ? `?${qs}` : location.pathname);
+      try { localStorage.setItem(STORE, JSON.stringify([...state.have])); } catch {}
+    }
+
+    const toggle = (set, value) => (set.has(value) ? set.delete(value) : set.add(value));
+    root.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      if (b.dataset.filter) toggle(state[b.dataset.filter], b.dataset.value);
+      else if (b.dataset.have) toggle(state.have, b.dataset.have);
+      else if (b.id === 'f-clear-pantry') state.have.clear();
+      else if (b.id === 'f-reset') {
+        state.q = q.value = '';
+        state.miss = miss.value = '';
+        for (const key of ['type', 'tradition', 'flavor']) state[key].clear();
+      } else return;
+      render();
+    });
+    q.addEventListener('input', () => { state.q = q.value; render(); });
+    miss.addEventListener('change', () => { state.miss = miss.value; render(); });
+
+    q.value = state.q;
+    miss.value = state.miss;
+    // A remembered pantry changes the results, so never leave it hidden in a closed panel.
+    if (state.have.size) $('f-pantry').open = true;
+    render();
+  }
+</script>

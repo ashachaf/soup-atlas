@@ -1,0 +1,37 @@
+---
+import { META } from '../lib/data.js';
+import '../styles/global.css';
+const { title, description } = Astro.props;
+const fullTitle = title ? `${title} | ${META.site.name}` : `${META.site.name}: ${META.site.tagline}`;
+const desc = description ?? META.site.tagline;
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={desc} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="he_IL" />
+    {Astro.site && <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet" />
+    <slot name="head" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">{META.site.name}</a>
+      <nav>
+        {Object.entries(META.families).map(([id, f]) => <a href={`/soups/${id}/`}>{f.title}</a>)}
+      </nav>
+    </header>
+    <main><slot /></main>
+    <footer class="site-footer">
+      <p>המתכונים נכתבו על סמך כמה מקורות ועדיין לא נבדקו במטבח. המקורות מופיעים בתחתית כל מתכון.</p>
+    </footer>
+  </body>
+</html>

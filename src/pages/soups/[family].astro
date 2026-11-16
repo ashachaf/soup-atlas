@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Finder from '../../components/Finder.astro';
+import { META, familyMembers, familyReference, sharedCore, diff, he, totalTime, fmtTime } from '../../lib/data.js';
+
+export function getStaticPaths() {
+  return Object.keys(META.families).map((family) => ({ params: { family } }));
+}
+
+const { family } = Astro.params;
+const info = META.families[family];
+const ref = familyReference(family);
+// Reference first, then the local versions, then the ones from around the world.
+const rank = (r) => (r.slug === ref.slug ? 0 : r.scope === 'local' ? 1 : 2);
+const members = familyMembers(family).sort((a, b) => rank(a) - rank(b));
+const shared = sharedCore(members).filter((s) => s.count / members.length >= 1 / 3);
+const names = (list) => list.map(he).join(', ');
+const count = members.length === 1 ? 'גרסה אחת' : `${members.length} גרסאות`;
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: info.title,
+  itemListElement: members.map((r, i) => ({ '@type': 'ListItem', position: i + 1, name: r.title, url: `/recipes/${r.slug}/` })),
+};
+---
+<Base title={`${info.title}: ${count} והשוואה ביניהן`} description={info.intro}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <p class="crumbs"><a href="/">כל המרקים</a> ‹ {info.title}</p>
+  <h1>{info.title}</h1>
+  <p class="lead">{info.intro}</p>
+
+  {members.length > 1 && shared.length > 0 && (
+    <>
+      <h2>מה משותף לגרסאות</h2>
+      <ul class="shared">
+        {shared.map((s) => (
+          <li class={s.count === members.length ? 'all' : ''}>
+            {he(s.id)}<small>{s.count === members.length ? 'בכולן' : `ב-${s.count} מתוך ${members.length}`}</small>
+          </li>
+        ))}
+      </ul>
+      <p class="muted small" style="margin-top:10px">זה סיכום של המשותף ולא מתכון. כל גרסה למטה היא מתכון מלא שעומד בפני עצמו.</p>
+    </>
+  )}
+
+  {members.length > 1 && (
+    <>
+      <h2>השוואה בין הגרסאות</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>גרסה</th><th>מסורת</th><th>סוג</th><th>זמן</th><th>מה נוסף לעומת {ref.short}</th><th>מה יורד</th></tr>
+          </thead>
+          <tbody>
+            {members.map((r) => {
+              const d = diff(r, ref);
+              const isRef = r.slug === ref.slug;
+              return (
+                <tr>
+                  <td><a href={`/recipes/${r.slug}/`}>{r.short}</a></td>
+                  <td>{r.tradition}</td>
+                  <td>{META.types[r.type]}</td>
+                  <td style="white-space:nowrap">{fmtTime(totalTime(r))}</td>
+                  <td class="plus">{isRef ? <span class="muted">גרסת הייחוס</span> : names(d.added) || '–'}</td>
+                  <td class="minus">{isRef ? '' : names(d.removed) || '–'}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+
+  <h2>{members.length > 1 ? 'בחירת גרסה' : 'המתכון'}</h2>
+  <Finder family={family} />
+</Base>

@@ -1,0 +1,173 @@
+---
+import Base from '../../layouts/Base.astro';
+import { recipes, ING, META, bySlug, familyMembers, familyReference, diff, he, roleOf, totalTime, fmtTime } from '../../lib/data.js';
+import { fmtQty } from '../../lib/qty.js';
+
+export function getStaticPaths() {
+  return recipes.map((r) => ({ params: { slug: r.slug } }));
+}
+
+const r = bySlug[Astro.params.slug];
+const family = META.families[r.family];
+const ref = familyReference(r.family);
+const d = r.slug === ref.slug ? null : diff(r, ref);
+const siblings = [r.family, ...(r.alsoIn ?? [])].map((f) => ({
+  id: f,
+  title: META.families[f].title,
+  items: familyMembers(f).filter((x) => x.slug !== r.slug),
+})).filter((s) => s.items.length);
+
+// Ingredient lines keep their written order, split into named groups where the recipe has them.
+const groups = [];
+for (const line of r.ingredients) {
+  const name = line.group ?? '';
+  let g = groups.find((x) => x.name === name);
+  if (!g) groups.push((g = { name, lines: [] }));
+  g.lines.push(line);
+}
+const lineText = (l) => [fmtQty(l.qty, l.unit), l.unit, l.text ?? he(l.id)].filter(Boolean).join(' ');
+const iso = (min) => `PT${min}M`;
+
+const ld = {
+  '@context': 'https://schema.org',
+  '@type': 'Recipe',
+  name: r.title,
+  description: r.summary,
+  inLanguage: 'he',
+  recipeCategory: 'מרק',
+  recipeCuisine: r.tradition,
+  keywords: [family.title, r.tradition, META.types[r.type]].join(', '),
+  prepTime: iso(r.prep),
+  cookTime: iso(r.cook),
+  totalTime: iso(totalTime(r)),
+  recipeYield: r.yield ?? `${r.servings} מנות`,
+  recipeIngredient: r.ingredients.map(lineText),
+  recipeInstructions: r.steps.map((text) => ({ '@type': 'HowToStep', text })),
+};
+---
+<Base title={r.title} description={r.summary}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <p class="crumbs"><a href="/">כל המרקים</a> ‹ <a href={`/soups/${r.family}/`}>{family.title}</a> ‹ {r.short}</p>
+  <h1>{r.title}</h1>
+  <p class="lead">{r.summary}</p>
+
+  <ul class="facts">
+    <li><b>הכנה</b>{fmtTime(r.prep)}</li>
+    <li><b>בישול</b>{fmtTime(r.cook)}</li>
+    <li><b>כמות</b>{r.yield ?? `${r.servings} מנות`}</li>
+    <li><b>רמת קושי</b>{r.difficulty}</li>
+    <li><b>מסורת</b>{r.tradition}</li>
+    <li><b>סוג</b>{META.types[r.type]}</li>
+  </ul>
+  <div class="chips">
+    {r.diet.map((t) => <span class="tag herb">{t}</span>)}
+    {r.addIns.map((t) => <span class="tag">{t}</span>)}
+  </div>
+  <p class="notice">המתכון נכתב על סמך כמה מקורות ועדיין לא נבדק במטבח. טועמים ומתקנים תיבול תוך כדי בישול.</p>
+
+  <div class="recipe-grid">
+    <section>
+      <h2>מרכיבים</h2>
+      <div class="servings" data-base={r.servings}>
+        <span>מנות:</span>
+        <button type="button" data-step="-1" aria-label="פחות מנות">−</button>
+        <output id="servings">{r.servings}</output>
+        <button type="button" data-step="1" aria-label="יותר מנות">+</button>
+      </div>
+      {groups.map((g) => (
+        <>
+          {g.name && <h3 class="ing-group">{g.name}</h3>}
+          <ul class="ings">
+            {g.lines.map((l) => (
+              <li>
+                <label>
+                  <input type="checkbox" />
+                  <span>
+                    {l.qty != null && <span class="qty" data-qty={l.qty} data-unit={l.unit}>{fmtQty(l.qty, l.unit)}</span>}
+                    {' '}{l.unit}{' '}
+                    {ING[l.id].recipe && ING[l.id].recipe !== r.slug
+                      ? <a href={`/recipes/${ING[l.id].recipe}/`}>{l.text ?? he(l.id)}</a>
+                      : l.text ?? he(l.id)}
+                    {roleOf(l) === 'optional' && <span class="opt">(לא חובה)</span>}
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </>
+      ))}
+    </section>
+
+    <section>
+      <h2>אופן ההכנה</h2>
+      <p style="margin-bottom:10px"><button class="btn" type="button" id="wake" aria-pressed="false" hidden>להשאיר את המסך דולק</button></p>
+      <ol class="steps">
+        {r.steps.map((s) => <li>{s}</li>)}
+      </ol>
+      {r.serve && <p style="margin-top:16px"><strong>הגשה:</strong> {r.serve}</p>}
+
+      <h2>טיפים</h2>
+      <ul class="tips">{r.tips.map((t) => <li>{t}</li>)}</ul>
+    </section>
+  </div>
+
+  {d && (
+    <section class="other">
+      <h2>במה הגרסה הזו שונה מ<a href={`/recipes/${ref.slug}/`}>{ref.short}</a></h2>
+      {d.added.length > 0 && <p class="plus"><strong>נוסף:</strong> {d.added.map(he).join(', ')}</p>}
+      {d.removed.length > 0 && <p class="minus"><strong>יורד:</strong> {d.removed.map(he).join(', ')}</p>}
+    </section>
+  )}
+
+  {siblings.map((s) => (
+    <section class="other">
+      <h2>עוד גרסאות של <a href={`/soups/${s.id}/`}>{s.title}</a></h2>
+      <div class="chips">
+        {s.items.map((x) => <a class="chip" href={`/recipes/${x.slug}/`}>{x.short}</a>)}
+      </div>
+    </section>
+  ))}
+
+  <h2>מקורות והשראה</h2>
+  <p class="sources">
+    {r.sources.map((s, i) => <>{i > 0 && ' · '}<a href={s.url} rel="noopener" target="_blank">{s.name}</a></>)}
+  </p>
+</Base>
+
+<script>
+  import { fmtQty } from '../../lib/qty.js';
+
+  // Servings scaler
+  const box = document.querySelector('.servings');
+  if (box) {
+    const base = Number(box.dataset.base);
+    const out = document.getElementById('servings');
+    let servings = base;
+    box.addEventListener('click', (e) => {
+      const step = Number(e.target.closest('button')?.dataset.step);
+      if (!step) return;
+      servings = Math.min(24, Math.max(1, servings + step));
+      out.textContent = String(servings);
+      for (const el of document.querySelectorAll('.qty')) {
+        el.textContent = fmtQty((Number(el.dataset.qty) * servings) / base, el.dataset.unit);
+      }
+    });
+  }
+
+  // Tap a step to mark it done
+  document.querySelector('.steps')?.addEventListener('click', (e) => e.target.closest('li')?.classList.toggle('done'));
+
+  // Keep the screen on while cooking, where the browser supports it
+  const wake = document.getElementById('wake');
+  if (wake && 'wakeLock' in navigator) {
+    let lock = null;
+    wake.hidden = false;
+    wake.addEventListener('click', async () => {
+      try {
+        if (lock) { await lock.release(); lock = null; }
+        else lock = await navigator.wakeLock.request('screen');
+      } catch {}
+      wake.setAttribute('aria-pressed', String(Boolean(lock)));
+    });
+  }
+</script>
