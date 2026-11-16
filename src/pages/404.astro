@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { link } from '../lib/data.js';
+---
+<Base title="הדף לא נמצא" description="הדף שחיפשתם לא קיים." noindex>
+  <h1>הסיר הזה ריק</h1>
+  <p class="lead">הדף שחיפשתם לא קיים, אולי הכתובת השתנתה או שהמתכון עבר מקום.</p>
+  <p class="chips" style="margin-top:20px">
+    <a class="chip" href={link('/')}>לדף הבית ולחיפוש</a>
+    <a class="chip" href={link('/soups/')}>כל המרקים</a>
+  </p>
+</Base>

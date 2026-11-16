@@ -11,6 +11,21 @@ export { ING, META, BRAND };
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 export const link = (path) => `${BASE}${path}`;
 
+// Absolute URL for structured data and social tags. Without a configured site (local dev)
+// it falls back to the relative link.
+const SITE = import.meta.env.SITE;
+export const abs = (path) => (SITE ? new URL(link(path), SITE).href : link(path));
+
+// Date used for recipes that have no "published" field of their own.
+export const LAUNCH_DATE = '2026-11-16';
+
+/** BreadcrumbList structured data from [name, path] pairs. */
+export const breadcrumbs = (items) => ({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: items.map(([name, path], i) => ({ '@type': 'ListItem', position: i + 1, name, item: abs(path) })),
+});
+
 // Fail the build on bad data instead of rendering a broken page.
 for (const r of recipes) {
   for (const line of r.ingredients) {

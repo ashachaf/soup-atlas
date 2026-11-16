@@ -34,3 +34,13 @@ The drawings themselves, and which ingredient maps to which drawing, are in
 
 A recipe belongs to one `family` and can be cross-listed in others with `alsoIn`.
 The build fails if a recipe uses an ingredient or family that is not defined.
+
+## SEO
+
+- Every page has a title, description, canonical URL and social share tags.
+- Recipe pages carry Recipe and BreadcrumbList structured data; family pages carry ItemList
+  and BreadcrumbList.
+- The deploy build writes `sitemap-index.xml` and `robots.txt`. On github.io, Google ignores
+  `robots.txt` (it is only read at a domain root), so submit the sitemap in Google Search Console.
+- The site icon and share image in `public/` are generated from the doodles and `brand.json`.
+  After changing the name, colors or drawings, run `node scripts/make-images.mjs`.

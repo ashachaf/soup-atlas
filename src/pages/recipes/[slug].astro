@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { link, recipes, ING, META, bySlug, familyMembers, familyReference, diff, he, roleOf, totalTime, fmtTime } from '../../lib/data.js';
+import { link, abs, breadcrumbs, LAUNCH_DATE, BRAND, recipes, ING, META, bySlug, familyMembers, familyReference, diff, he, roleOf, totalTime, fmtTime } from '../../lib/data.js';
 import { fmtQty } from '../../lib/qty.js';
 
 export function getStaticPaths() {
@@ -31,11 +31,16 @@ for (const line of r.ingredients) {
 const lineText = (l) => [fmtQty(l.qty, l.unit), l.unit, l.text ?? he(l.id)].filter(Boolean).join(' ');
 const iso = (min) => `PT${min}M`;
 
+const crumbs = breadcrumbs([[BRAND.name, '/'], [family.title, `/soups/${r.family}/`], [r.short, `/recipes/${r.slug}/`]]);
+
 const ld = {
   '@context': 'https://schema.org',
   '@type': 'Recipe',
   name: r.title,
   description: r.summary,
+  url: abs(`/recipes/${r.slug}/`),
+  author: { '@type': 'Organization', name: BRAND.name, url: abs('/') },
+  datePublished: r.published ?? LAUNCH_DATE,
   inLanguage: 'he',
   recipeCategory: r.type === 'addon' ? 'תוספת למרק' : 'מרק',
   recipeCuisine: r.tradition,
@@ -48,8 +53,9 @@ const ld = {
   recipeInstructions: r.steps.map((text) => ({ '@type': 'HowToStep', text })),
 };
 ---
-<Base title={r.title} description={r.summary} doodles={r.ingredients.map((l) => l.id)}>
+<Base title={r.title} description={r.summary} doodles={r.ingredients.map((l) => l.id)} type="article">
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(ld)} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(crumbs)} />
   <p class="crumbs"><a href={link('/')}>כל המרקים</a> ‹ <a href={link(`/soups/${r.family}/`)}>{family.title}</a> ‹ {r.short}</p>
   <h1>{r.title}</h1>
   <p class="lead">{r.summary}</p>
